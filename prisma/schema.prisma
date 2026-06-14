@@ -1,0 +1,134 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  DOCTOR
+  PATIENT
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+enum AIFeature {
+  MEDICAL_SUMMARY
+  ADMIN_RECOMMENDATION
+  SLOT_SUGGESTION
+  PATIENT_MESSAGE
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  role          Role      @default(PATIENT)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  patient       Patient?
+  doctor        Doctor?
+  aiInteractions AIInteraction[]
+}
+
+model Patient {
+  id            String    @id @default(cuid())
+  userId        String    @unique
+  firstName     String
+  lastName      String
+  phone         String?
+  birthDate     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  user          User      @relation(fields: [userId], references: [id])
+  appointments  Appointment[]
+}
+
+model Doctor {
+  id                         String    @id @default(cuid())
+  userId                     String    @unique
+  firstName                  String
+  lastName                   String
+  specialty                  String
+  appointmentDurationMinutes Int       @default(30)
+  createdAt                  DateTime  @default(now())
+  updatedAt                  DateTime  @updatedAt
+  deletedAt                  DateTime?
+
+  user                       User      @relation(fields: [userId], references: [id])
+  availabilities             DoctorAvailability[]
+  appointments               Appointment[]
+}
+
+model DoctorAvailability {
+  id        String   @id @default(cuid())
+  doctorId  String
+  dayOfWeek Int      // 0 = Domingo ... 6 = Sábado
+  startTime String   // Formato "HH:mm" (Local)
+  endTime   String   // Formato "HH:mm" (Local)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  doctor    Doctor   @relation(fields: [doctorId], references: [id])
+
+  @@index([doctorId, dayOfWeek])
+}
+
+model Appointment {
+  id                String            @id @default(cuid())
+  patientId         String
+  doctorId          String
+  startTime         DateTime          // UTC Timestamp
+  endTime           DateTime          // UTC Timestamp
+  status            AppointmentStatus @default(PENDING)
+  rescheduledFromId String?           // ID del turno original si este fue reprogramado
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  deletedAt         DateTime?
+
+  patient           Patient           @relation(fields: [patientId], references: [id])
+  doctor            Doctor            @relation(fields: [doctorId], references: [id])
+  medicalNote       MedicalNote?
+  notes             String?           // Descripción libre del paciente al solicitar el turno
+
+  @@index([doctorId, startTime, endTime])
+  @@index([doctorId, startTime])
+  @@index([patientId])
+}
+
+model MedicalNote {
+  id            String      @id @default(cuid())
+  appointmentId String      @unique
+  content       String      // Texto libre de observación
+  aiSummary     String?      // JSON serializado como String (SQLite)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+}
+
+model AIInteraction {
+  id           String     @id @default(cuid())
+  userId       String
+  feature      AIFeature
+  provider     String
+  inputSummary String
+  outputJson   String       // JSON serializado como String (SQLite)
+  createdAt    DateTime   @default(now())
+
+  user         User       @relation(fields: [userId], references: [id])
+
+  @@index([userId, feature, createdAt])
+}
