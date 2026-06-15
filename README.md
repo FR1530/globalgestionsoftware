@@ -1,22 +1,30 @@
-# MediTurnos
+# 🏥 MediTurnos — Sistema de Gestión de Turnos Médicos
 
-MediTurnos es una plataforma moderna para la gestión eficiente de turnos médicos. Está diseñada para administradores, médicos y pacientes, ofreciendo un control de agenda estricto, mitigación de colisiones de turnos mediante transacciones atómicas e integración de Inteligencia Artificial para comunicación proactiva y personalizada con los pacientes.
+MediTurnos es una plataforma moderna e integrada para la gestión eficiente de turnos médicos, diseñada para optimizar los flujos de trabajo de administradores, médicos y pacientes. El sistema implementa un control de agenda estricto, mitigación de colisiones de turnos mediante transacciones atómicas de base de datos e integración profunda de Inteligencia Artificial para la comunicación proactiva y personalizada.
 
-## 🚀 Tecnologías
+---
 
+## 🚀 Tecnologías e IA Asistente 
+
+Este proyecto fue diseñado y ejecutado bajo un enfoque de **Desarrollo Ágil Asistido por IA**, utilizando modelos fundacionales avanzados tanto en el proceso de ingeniería de software (co-piloto de desarrollo) como en las reglas de negocio del dominio de aplicación.
+
+### 🤖 Arsenal de IA y Herramientas Asistentes
+* * **IA de Cátedra / Co-piloto de Desarrollo**: **Gemini 2.5 Pro** (vía el agente autónomo **Antigravity** integrado en el entorno de **Open Design CLI**), utilizado estratégicamente en la planificación de la arquitectura, generación de código de extremo a extremo, diagnóstico de errores en middlewares y armado de la suite de testing.
+* **IA de Dominio (En la Aplicación)**: **Vercel AI SDK** combinado con el servicio de Groq API corriendo el modelo de código abierto de alto rendimiento **`llama-3.3-70b-versatile`**.
+
+### 🛠️ Stack Tecnológico Base
 - **Framework**: Next.js 15 (App Router)
-- **Base de Datos**: PostgreSQL (Neon)
+- **Base de Datos**: SQLite
 - **ORM**: Prisma (Prisma Client + Prisma Studio)
 - **Autenticación**: Auth.js (NextAuth v5) con estrategia JWT
 - **UI & Estilos**: Tailwind CSS, shadcn/ui, Recharts, Lucide Icons
-- **IA**: Vercel AI SDK + Groq SDK (`llama-3.3-70b-versatile`) con validaciones Zod
 - **Testing y CI**: Vitest, vitest-mock-extended, GitHub Actions
 
 ## 🏗️ Arquitectura del Sistema
 
-La arquitectura sigue el patrón de Server Actions y Client Components en Next.js, apoyándose fuertemente en Prisma para las transacciones seguras de base de datos y Auth.js para control de acceso (RBAC) descentralizado.
+La solución adopta un patrón arquitectónico desacoplado pero cohesivo, donde Next.js actúa como el núcleo orquestador. Las interacciones de la base de datos se ejecutan en el servidor mediante *Server Actions*, blindando la lógica de negocio del lado del cliente.
 
-## 📊 Diagrama de Arquitectura (Mermaid)
+### 📊 Diagrama de Arquitectura (Mermaid)
 
 ```mermaid
 graph TD
@@ -28,13 +36,13 @@ graph TD
         Next -->|Generación On-Demand| AI[Módulo IA]
     end
 
-    Prisma -->|Conexión Segura| DB[(PostgreSQL / Neon)]
+    Prisma -->|Persistencia Local| DB[(SQLite: dev.db)]
     
     subgraph "AI Provider Integration"
         AI -->|Vercel AI SDK + Zod| Groq[Groq API: llama-3.3-70b]
     end
     
-    subgraph "Roles"
+    subgraph "Roles de Acceso"
         Auth -.-> Admin[ADMIN]
         Auth -.-> Doctor[DOCTOR]
         Auth -.-> Patient[PATIENT]
@@ -48,33 +56,15 @@ graph TD
    ```bash
    npm install
    ```
-3. Configurar el archivo `.env` (ver sección Variables de Entorno).
-4. Sincronizar Prisma y levantar base de datos:
-   ```bash
-   npx prisma generate
-   npx prisma migrate dev
-   npx prisma db seed
-   ```
-5. Iniciar el servidor local:
+3. Encender el sistema:
    ```bash
    npm run dev
    ```
-
-## 🔐 Variables de Entorno
-
-Crear un archivo `.env` tomando como referencia `.env.example`. Variables requeridas:
-
-- `DATABASE_URL`: URI de conexión a la base PostgreSQL.
-- `AUTH_SECRET`: Llave secreta para firmar los JWT de Auth.js (Mínimo 32 caracteres).
-- `NEXTAUTH_URL`: URL base de la aplicación (ej. `http://localhost:3000`).
-- `AI_PROVIDER`: Proveedor de IA (por defecto `groq`).
-- `GROQ_API_KEY`: Clave de API provista por Groq Console.
-- `DEFAULT_TIMEZONE`: Zona horaria a utilizar para los cálculos lógicos (ej. `America/Argentina/Mendoza`).
-- `CANCELLATION_MIN_HOURS`: Regla de negocio para determinar cuantas horas de anticipación son obligatorias para cancelar un turno (ej. `2`).
+4. Abra el navegador e ingresar a la siguiente dirección: http://localhost:3000
 
 ## 🌱 Seed de Datos
 
-Al correr el comando `npx prisma db seed`, la base de datos se poblará automáticamente con perfiles para pruebas inmediatas. 
+La base de datos se puebla automáticamente durante el paso 2 con tres perfiles configurados para auditar el Control de Acceso Basado en Roles (RBAC).
 Todas las contraseñas para los usuarios del seed son: `password123`
 
 - **Administrador**: `admin@mediturnos.com`
@@ -88,24 +78,9 @@ La suite completa está 100% mockeada (no depende de DB local ni Groq) para gara
 npm run test
 ```
 
-## 🚀 Despliegue (Vercel + Neon)
-
-Para llevar este proyecto a producción:
-1. Crear una base de datos en **Neon** (PostgreSQL Serverless) y copiar el Connection String.
-2. Enlazar el repositorio de GitHub en **Vercel**.
-3. En la configuración de Vercel (Sección Environment Variables), cargar:
-   - `DATABASE_URL` (Directo a Neon).
-   - `AUTH_SECRET` (Generar una nueva llave de 32 caracteres).
-   - `GROQ_API_KEY` (Token de producción).
-   - *Nota*: Vercel auto-configura variables para NextAuth si no existe un dominio personalizado, por lo que `NEXTAUTH_URL` puede omitirse.
-4. En los **Build Settings** de Vercel, asegurar el comando de Install incluya generación de cliente: `npm install && npx prisma generate`.
-5. Ejecutar despliegue.
 
 ## 🤖 Uso de Inteligencia Artificial
 
 El sistema integra un Módulo de IA *On-Demand* que automatiza las notificaciones a los pacientes frente a eventos atípicos o transiciones de estado.
 El sistema invoca a la API de Groq usando `llama-3.3-70b-versatile` combinado con el Vercel AI SDK. Las salidas son validadas con `zod` para evitar alucinaciones, y los registros se insertan silenciosamente en una bitácora `AIInteraction` sin pausar la UX ni requerir costosos Jobs asíncronos.
 
-## 👤 Autor
-
-Desarrollado y mantenido asistidamente bajo directrices de requerimientos avanzados de agentes AI (Antigravity). 

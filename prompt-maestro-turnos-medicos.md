@@ -1,4 +1,4 @@
-# Sistema Inteligente de Gestión de Turnos Médicos — Prompt Maestro Final
+# Sistema Inteligente de Gestión de Turnos Médicos
 
 ## Objetivo
 
@@ -17,13 +17,11 @@ El proyecto será utilizado como Trabajo Práctico Integrador universitario, por
 
 * Repositorio público en GitHub.
 * Aplicación desplegada en Vercel.
-* README.md profesional.
-* TECHNICAL_REPORT.md.
+* README.md
 * .env.example.
 * Migraciones Prisma.
 * Script de seed.
 * Tests automatizados.
-* GitHub Actions funcionando.
 
 ---
 
@@ -69,8 +67,8 @@ Esperar confirmación antes de continuar con la generación masiva de código.
 
 ## Base de Datos
 
-* PostgreSQL (Neon)
-
+* SQLite
+* PostgreSQL (Neon) (Segunda etapa despliege, aún no nos enfoquemos en ello pero tengamoslo en cuenta)
 ## ORM
 
 * Prisma
@@ -118,8 +116,6 @@ Reglas de manejo de fechas:
 * Vercel AI SDK
 * Groq como proveedor principal
 * Modelo: llama-3.3-70b-versatile
-
-(Nota: `llama-3.1-70b-versatile` está deprecado por Groq y ya no responde; usar siempre `llama-3.3-70b-versatile` como modelo por defecto.)
 
 La arquitectura debe permitir agregar otros proveedores en el futuro mediante una interfaz común, pero no es necesario implementar fallback automático.
 
@@ -692,7 +688,6 @@ Incluir:
 8. Ejecución de tests.
 9. Despliegue.
 10. Uso de IA dentro de la aplicación.
-11. Autor.
 
 ---
 
@@ -737,10 +732,6 @@ Explicar:
 * Groq
 * Zod
 
-## Lecciones aprendidas
-
-Reflexión final sobre desarrollo asistido por IA.
-
 ---
 
 # Implementación
@@ -759,7 +750,6 @@ Una vez aprobada la arquitectura inicial, generar el proyecto por módulos en el
 10. Tests.
 11. CI/CD.
 12. README.
-13. TECHNICAL_REPORT.
 
 Mantener consistencia absoluta entre todos los archivos generados.
 
