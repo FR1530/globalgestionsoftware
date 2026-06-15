@@ -65,11 +65,13 @@ graph TD
 ## 🌱 Seed de Datos
 
 La base de datos se puebla automáticamente durante el paso 2 con tres perfiles configurados para auditar el Control de Acceso Basado en Roles (RBAC).
-Todas las contraseñas para los usuarios del seed son: `password123`
 
-- **Administrador**: `admin@mediturnos.com`
-- **Médico (Cardiología)**: `doctor@mediturnos.com`
-- **Paciente**: `patient@mediturnos.com`
+- **Administrador**: `admin@system.com`
+- **Contraseña**: `admin123`
+- **Médico (Cardiología)**: `doctor@system.com`
+- **Contraseña**: `doctor123`
+- **Paciente**: `patient@system.com`
+- **Contraseña**: `patient123`
 
 ## 🧪 Ejecución de Tests
 
